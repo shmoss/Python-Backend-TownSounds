@@ -6,10 +6,16 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import geocoder
+import mapbox
 import selenium
 from selenium import webdriver
 
+geocoder = mapbox.Geocoder(access_token='pk.eyJ1Ijoic3RhcnJtb3NzMSIsImEiOiJjam13ZHlxbXgwdncwM3FvMnJjeGVubjI5In0.-ridMV6bkkyNhbPfMJhVzw')
 
+response = geocoder.forward('Chester, NJ')
+result = response.json()
+
+print result
 
 #This simulates page-clicks using Selenium
 #Simulate page-click for each event to grab address
@@ -41,8 +47,24 @@ print(len(events))
 # iterate throw all events and open them.
 for event in events:
     driver.get(event)
-    uniqueEventContainer = driver.find_elements_by_css_selector('div[class^=eventInfoContainer-]')
-    print uniqueEventContainer[0].text
+
+    uniqueEventContainer = driver.find_elements_by_css_selector('div[class^=eventInfoContainer-]')[0]
+    #uniqueEventContainer2 = driver.find_elements_by_css_selector('div[class^=eventInfoContainer-9e539994]')[0]
+    #uniqueEventContainer3 = driver.find_elements_by_css_selector('div[class^=eventInfoContainer-2d9f07df]')[0]
+    print "Date is: "+ uniqueEventContainer.text
+    #print uniqueEventContainer
+    #print "date: "+uniqueEventContainer2.text
+    #print "address: "+uniqueEventContainer3.text
+    uniqueArtistContainer = driver.find_elements_by_css_selector('div[class^=artistAndEventInfo-]')
+    for i in uniqueArtistContainer:
+        h1 = driver.find_element_by_tag_name('h1')
+        print "Band is: "+h1.text
+    #for i in uniqueEventContainer:
+        #date = driver.find_elements_by_css_selector('div[class^=eventInfoContainer-]')
+        #print i
+        #print date.text
+    #print uniqueEventContainer[0].text
+    #print h1
     #uniqueEventContainerHMTL = uniqueEventContainer.get_attribute('innerHTML')
     #print uniqueEventContainerHMTL
     eventContainerBucket.append(uniqueEventContainer)
