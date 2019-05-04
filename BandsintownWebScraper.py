@@ -34,7 +34,9 @@ for i in range(1, 2):
 print(len(events))
 
 # iterate throw all events and open them.
+item = {}
 for event in events:
+
     driver.get(event)
     #print event
     #uniqueEventContainer = driver.find_elements_by_css_selector('div[class^=eventInfoContainer-]')[0]
@@ -54,6 +56,18 @@ for event in events:
     response = geocoder.forward(address)
     result = response.json()
     venue = soup.select_one('[class^=eventInfoContainer-2d9f07df]:nth-of-type(1) div').text
+
+    #Bin into 'item'
+    item['Artist'] = artist
+    item['Date'] = date
+    item['Time'] = time
+    item['Venue'] = venue
+    item['Address'] = address
+
+    case = {'Artist': item['Artist'], 'Date':  item['Date'], 'Time': item['Time'], 'Venue': item['Venue'], 'Address': item['Address']}
+    item[event] = case
+    #print item
+
     # address = soup.select_one('[class^=eventInfoContainer-]:nth-of-type(3) div + div').text
     # print(date, time, address)
     #locationImg = soup.select_one('[src="https://assets.bandsintown.com/images/pin.svg"]')['src']
@@ -63,10 +77,15 @@ for event in events:
     #venue = venue_address[0]
     #address = venue_address[1]
 
-    print date, time, venue, address, result
+    #print date, time, venue, address
+    #item[event] = item
+    print item
 
-
-
+print item
+with open("testScrape.json", "w") as writeJSON:
+   json.dump(item, writeJSON, ensure_ascii=False)
+    #for uniqueDate = i.find_all('div', {'class': 'event-b58f7990'})
+    #print (uniqueDate)
 
 
 print result

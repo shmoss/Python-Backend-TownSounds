@@ -239,9 +239,9 @@ for i in soupBucket:
                #print("Artist: " + item['Artist'])
                #print("Venue: " + item['Venue'])
                #print("Location: " + item['Location'])
-               uniqueLocation = (venue + "," + location)
-               g = geocoder.google('Mountain View, CA', key='AIzaSyCuC03rYbaH2WFQLy-4EO7qVSipEM84Iy4')
-               print location
+               #uniqueLocation = (venue + "," + location)
+               #g = geocoder.google('Mountain View, CA', key='AIzaSyCuC03rYbaH2WFQLy-4EO7qVSipEM84Iy4')
+               #print location
                #print geocodedLocation
                #print "unique location is" + uniqueLocation
                #latLong = 'https://maps.googleapis.com/maps/api/geocode/json?address=' +[uniqueLocation] + '&sensor=true'
@@ -277,7 +277,7 @@ for i in soupBucket:
 
 
 #print entries
-
+print item
 with open("textbooks5.json", "w") as writeJSON:
    json.dump(item, writeJSON, ensure_ascii=False)
     #for uniqueDate = i.find_all('div', {'class': 'event-b58f7990'})
