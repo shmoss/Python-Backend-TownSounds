@@ -23,8 +23,16 @@ def suffix(d):
 def custom_strftime(format, t):
     return t.strftime(format).replace('{S}', str(t.day) + suffix(t.day))
 
-oneWeekFromToday = custom_strftime('%A, %B {S}, %Y', dt.now())
-print oneWeekFromToday
+nowDate = datetime.datetime.now()
+oneWeeks = datetime.timedelta(weeks = 1)
+week = nowDate + oneWeeks
+
+oneWeekFromNow = custom_strftime('%A, %B {S}, %Y', dt.now() + oneWeeks)
+print "oneWeekFromNow is: " + oneWeekFromNow
+
+#oneWeekFromToday = todaysDate + oneWeek
+
+#print "oneWeekFromToday is: " + oneWeekFromToday
 
 now = datetime.datetime.now()
 print (now.strftime("%A, %b %d, %Y"))
@@ -34,8 +42,9 @@ oneWeek = datetime.timedelta(weeks = 1)
 
 weekFromToday = now + oneWeek
 print (weekFromToday.strftime("%A, %b %d, %Y"))
+weekFromTodayString = custom_strftime('%A, %B {S}, %Y', dt.now())
 
-
+testVariable = "Monday, May 13th, 2019"
 
 #Set up geocoder
 geocoder = mapbox.Geocoder(access_token='pk.eyJ1Ijoic3RhcnJtb3NzMSIsImEiOiJjam13ZHlxbXgwdncwM3FvMnJjeGVubjI5In0.-ridMV6bkkyNhbPfMJhVzw')
@@ -49,7 +58,7 @@ base_url = 'https://www.bandsintown.com/?came_from=257&page='
 #https://www.bandsintown.com/e/1009883476-kronos-quartet-and-mahsa-vahdat-at-weill-hall?came_from=257&utm_medium=web&utm_source=home&utm_campaign=event
 events = []
 eventContainerBucket = []
-for i in range(1, 2):
+for i in range(1, 40):
     #pageSource = driver.page_source
     #print pageSource + "page source"
     #if not driver.page_source().contains("404"):
@@ -90,7 +99,7 @@ for event in events:
         date_time = containers[1].text.split('\n')
 
         dateMatch = soup.select_one('img + div').text
-        if dateMatch == oneWeekFromToday:
+        if dateMatch <= oneWeekFromNow:
             print "match!"
 
             #print soup
@@ -153,7 +162,7 @@ for event in events:
         print item
 
 with open("testScrape.json", "w") as writeJSON:
-   json.dump(item, writeJSON, ensure_ascii=False)
+   json.dump(item, writeJSON)
     #for uniqueDate = i.find_all('div', {'class': 'event-b58f7990'})
     #print (uniqueDate)
 
