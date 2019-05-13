@@ -12,7 +12,7 @@ from selenium import webdriver
 
 geocoder = mapbox.Geocoder(access_token='pk.eyJ1Ijoic3RhcnJtb3NzMSIsImEiOiJjam13ZHlxbXgwdncwM3FvMnJjeGVubjI5In0.-ridMV6bkkyNhbPfMJhVzw')
 
-response = geocoder.forward('Chester, NJ')
+response = geocoder.forward('502 Ross Dr, Sunnyvale, CA 94089')
 result = response.json()
 
 print result
