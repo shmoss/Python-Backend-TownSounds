@@ -4,6 +4,7 @@ print 'Let bandsintown scraping commence!'
 
 from bs4 import BeautifulSoup
 import requests
+import string
 import json
 import geocoder
 import mapbox
@@ -13,9 +14,16 @@ from selenium import webdriver
 from selenium import webdriver
 from bs4 import BeautifulSoup as bs
 import datetime
-
-
 from datetime import datetime as dt
+import re
+from selenium.webdriver.chrome.options import Options
+
+options = Options()
+options.add_argument('--no-sandbox') # Bypass OS security model
+driverLocation = webdriver.Chrome(chrome_options=options, executable_path=r'/Applications/chromedriver74')
+driverLocation.get('http://www.python.org')
+print(driverLocation.title)
+driverLocation.quit()
 
 def suffix(d):
     return 'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')
@@ -29,6 +37,15 @@ week = nowDate + oneWeeks
 
 oneWeekFromNow = custom_strftime('%A, %B {S}, %Y', dt.now() + oneWeeks)
 print "oneWeekFromNow is: " + oneWeekFromNow
+oneWeekFromNowSplit = oneWeekFromNow.split(',')
+oneWeekFromNowDay = oneWeekFromNowSplit[1]
+print oneWeekFromNowDay
+oneWeekFromNowDayCleaned = (re.sub(r'\D+$', '', oneWeekFromNowDay))
+oneWeekFromNowDayFinal = (oneWeekFromNowSplit[0] + "," + oneWeekFromNowDayCleaned + "," + oneWeekFromNowSplit[2])
+print oneWeekFromNowDayFinal
+oneWeekFromNowDayFinalDateTime = datetime.datetime.strptime(oneWeekFromNowDayFinal, '%A, %b %d, %Y')
+print oneWeekFromNowDayFinalDateTime
+#print "oneWeekFromNow Split is: "+ oneWeekFromNowSplit[1]
 
 #oneWeekFromToday = todaysDate + oneWeek
 
@@ -44,8 +61,11 @@ weekFromToday = now + oneWeek
 print (weekFromToday.strftime("%A, %b %d, %Y"))
 weekFromTodayString = custom_strftime('%A, %B {S}, %Y', dt.now())
 
-testVariable = "Monday, May 13th, 2019"
 
+testVariable = "Monday, May 13, 2019"
+testSplit = testVariable.split(',')
+print testSplit
+print testSplit[1]
 #Set up geocoder
 geocoder = mapbox.Geocoder(access_token='pk.eyJ1Ijoic3RhcnJtb3NzMSIsImEiOiJjam13ZHlxbXgwdncwM3FvMnJjeGVubjI5In0.-ridMV6bkkyNhbPfMJhVzw')
 
@@ -58,7 +78,7 @@ base_url = 'https://www.bandsintown.com/?came_from=257&page='
 #https://www.bandsintown.com/e/1009883476-kronos-quartet-and-mahsa-vahdat-at-weill-hall?came_from=257&utm_medium=web&utm_source=home&utm_campaign=event
 events = []
 eventContainerBucket = []
-for i in range(1, 40):
+for i in range(1, 50):
     #pageSource = driver.page_source
     #print pageSource + "page source"
     #if not driver.page_source().contains("404"):
@@ -99,8 +119,31 @@ for event in events:
         date_time = containers[1].text.split('\n')
 
         dateMatch = soup.select_one('img + div').text
-        if dateMatch <= oneWeekFromNow:
+        datetime1 = datetime.datetime.strptime(testVariable, '%A, %b %d, %Y')
+        print datetime1
+        #oneWeekFromNowDate = datetime.datetime.strptime(re.sub('th|nd|st', '', oneWeekFromNow), '%A, %b %d, %Y')
+        #dateMatchDate = datetime.datetime.strptime(re.sub('th|nd|st', '', dateMatch), '%A, %b %d, %Y')
+
+        #New approach
+
+        dateMatchSplit = dateMatch.split(',')
+        dateMatchDay = dateMatchSplit[1]
+
+        dateMatchCleaned = (re.sub(r'\D+$', '', dateMatchDay))
+        dateMatchDayFinal = (
+                dateMatchSplit[0] + "," + dateMatchCleaned + "," + dateMatchSplit[2])
+        print dateMatchDayFinal
+        dateMatchDayFinalDate = datetime.datetime.strptime(dateMatchDayFinal, '%A, %b %d, %Y')
+        #one = datetime.datetime.strptime(dateMatchDayFinal, '%A, %b %d, %Y')
+        print "comparing now!"
+        print dateMatchDayFinalDate, oneWeekFromNowDayFinalDateTime
+
+        if dateMatchDayFinalDate <= oneWeekFromNowDayFinalDateTime:
             print "match!"
+
+
+            #datetime2 = datetime.datetime.strptime(oneWeekFromNow, '%A, %B {S}, %Y')
+            #print (datetime.datetime.strptime(dateMatch, '%A, %b %d, %Y'))
 
             #print soup
             #print soup2
@@ -159,7 +202,7 @@ for event in events:
             'Address': item['Address'], 'Coordinates': item['Coordinates']}
             item[event] = case
 
-        print item
+            print item
 
 with open("testScrape.json", "w") as writeJSON:
    json.dump(item, writeJSON)
