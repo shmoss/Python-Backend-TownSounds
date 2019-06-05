@@ -63,6 +63,16 @@ print oneWeekDateTime
 #print (weekFromToday.strftime("%A, %b %d, %Y"))
 #weekFromTodayString = custom_strftime('%A, %B {S}, %Y', dt.now())
 
+# For testing, set date one day from now
+day = datetime.timedelta(days=1)
+oneDay = custom_strftime('%A, %B {S}, %Y', dt.now() + day)
+oneDaySplit = oneDay.split(',')
+oneDayfromNow = oneDaySplit[1]
+oneDayCleaned = (re.sub(r'\D+$', '', oneDayfromNow))
+oneDayFinal = (oneDaySplit[0] + "," + oneDayCleaned + "," + oneDaySplit[2])
+oneDayDateTime = datetime.datetime.strptime(oneDayFinal, '%A, %B %d, %Y')
+print oneDayDateTime, oneWeekDateTime
+
 
 #Set up geocoder
 geocoder = mapbox.Geocoder(access_token='pk.eyJ1Ijoic3RhcnJtb3NzMSIsImEiOiJjam13ZHlxbXgwdncwM3FvMnJjeGVubjI5In0.-ridMV6bkkyNhbPfMJhVzw')
@@ -76,7 +86,7 @@ base_url = 'https://www.bandsintown.com/?came_from=257&page='
 events = []
 eventContainerBucket = []
 
-for i in range(1, 50):
+for i in range(1, 2):
 
     #cycle through pages in range
     driver.get(base_url + str(i))
@@ -91,6 +101,7 @@ print "total events: ", (len(events))
 
 # iterate through all events and open them.
 item = {}
+allEvents = []
 for event in events:
 
     driver.get(event)
@@ -121,8 +132,8 @@ for event in events:
         #print dateMatchDate, oneWeekDateTime
 
         #compare date of event to one week from now date
-        if dateMatchDate <= oneWeekDateTime:
-            print "this event occurs one week or less from today"
+        if dateMatchDate <= oneDayDateTime:
+            #print "this event occurs one week or less from today"
 
             # Get artist
             artist = soup2.select_one('h1').text
@@ -152,7 +163,8 @@ for event in events:
             #children = container.find("img")
             #thing = driver.find_element_by_xpath("//div[@class^=artistAndEventInfo-7c13900b']/img")
             #print thing
-            print(driver.find_element_by_xpath("//div[@class='artistAndEventInfo-7c13900b']//img").get_attribute("src"))
+            artistImage=driver.find_element_by_xpath("//div[@class='artistAndEventInfo-7c13900b']//img").get_attribute("src")
+            #print artistImage
 
             #Get other event information
             #otherInfo = soup.select_one('[class^=eventInfoContainer-a1c6de30]').text
@@ -166,33 +178,42 @@ for event in events:
             #Bin information into 'item'
             item['Artist'] = artist
             item['Date'] = date
-            item['eventDate']  = eventDate
+            item['eventDate'] = eventDate
             item['Time'] = time
             item['Venue'] = venue
             item['Address'] = address
+            item['artistImage'] = artistImage
 
-            print ("date is:" + date)
-            print ("datematch date is", dateMatchDate)
+            #print ("date is:" + date)
+            #print ("datematch date is", dateMatchDate)
 
             # Get latitude, longitude
             coordinates = result['features'][0]['center']
             item['Coordinates'] = coordinates
+            #print item['Coordinates']
 
-            print result
-            print address, str(coordinates)
+            #print result
+            #print address, str(coordinates)
 
             # Format output to JSON
             case = {'Artist': item['Artist'], 'Date': item['Date'], 'EventDate': item['eventDate'], 'Time': item['Time'], 'Venue': item['Venue'],
-            'Address': item['Address'], 'Coordinates': item['Coordinates']}
+            'Address': item['Address'], 'Coordinates': coordinates, 'ArtistImage': item['artistImage']}
             item[event] = case
+            #print case
+            allEvents.append(case)
 
             #print item
-
+#print item
+print allEvents
 with open("testScrape.json", "w") as writeJSON:
-   json.dump(item, writeJSON)
+   json.dump(item, writeJSON, sort_keys=True)
     #for uniqueDate = i.find_all('div', {'class': 'event-b58f7990'})
     #print (uniqueDate)
 
+with open("testScrape2.json", "w") as writeJSON:
+   json.dump(allEvents, writeJSON, sort_keys=True)
+    #for uniqueDate = i.find_all('div', {'class': 'event-b58f7990'})
+    #print (uniqueDate)
 
 #print result
 print "Data pull complete!"
