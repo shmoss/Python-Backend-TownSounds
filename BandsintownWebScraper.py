@@ -17,6 +17,8 @@ import datetime
 from datetime import datetime as dt
 import re
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import ElementNotVisibleException
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 #Set driver options
@@ -132,7 +134,7 @@ for event in events:
         #print dateMatchDate, oneWeekDateTime
 
         #compare date of event to one week from now date
-        if dateMatchDate <= oneDayDateTime:
+        if dateMatchDate <= oneWeekDateTime:
             #print "this event occurs one week or less from today"
 
             # Get artist
@@ -140,6 +142,7 @@ for event in events:
 
             # Get date
             date = soup.select_one('img + div').text
+
 
             # Get time
             time = soup.select_one('img + div + div').text
@@ -169,6 +172,13 @@ for event in events:
             #Get other event information
             #otherInfo = soup.select_one('[class^=eventInfoContainer-a1c6de30]').text
             #print "other info", otherInfo
+
+            #Get genre information
+            try:
+                f = driver.find_element_by_xpath("//div[@class='artistBio-833c365c']")
+                print f.text
+            except (ElementNotVisibleException, NoSuchElementException):
+                pass
 
             #Geocode address
             geocodeInput = venue + ", " + address
@@ -203,6 +213,9 @@ for event in events:
             allEvents.append(case)
 
             #print item
+
+        elif currentRequest.status_code != 200:  # could also check == requests.codes.ok
+            continue
 #print item
 print allEvents
 with open("testScrape.json", "w") as writeJSON:
@@ -210,7 +223,7 @@ with open("testScrape.json", "w") as writeJSON:
     #for uniqueDate = i.find_all('div', {'class': 'event-b58f7990'})
     #print (uniqueDate)
 
-with open("testScrape2.json", "w") as writeJSON:
+with open("/Users/starrmoss/Documents/TownSounds_Javascript/data/testScrape3.json", "w") as writeJSON:
    json.dump(allEvents, writeJSON, sort_keys=True)
     #for uniqueDate = i.find_all('div', {'class': 'event-b58f7990'})
     #print (uniqueDate)
