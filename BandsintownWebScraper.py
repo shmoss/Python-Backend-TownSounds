@@ -25,8 +25,6 @@ from selenium.webdriver.common.by import By
 options = Options()
 options.add_argument('--no-sandbox') # Bypass OS security model
 driverLocation = webdriver.Chrome(chrome_options=options, executable_path=r'/Applications/chromedriver74')
-#driverLocation.get('http://www.python.org')
-#print(driverLocation.title)
 driverLocation.quit()
 
 def suffix(d):
@@ -38,7 +36,6 @@ def custom_strftime(format, t):
 # Set date one week from now
 nowDate = datetime.datetime.now()
 week = datetime.timedelta(weeks = 1)
-
 oneWeek = custom_strftime('%A, %B {S}, %Y', dt.now() + week)
 oneWeekSplit = oneWeek.split(',')
 oneWeekDay = oneWeekSplit[1]
@@ -49,21 +46,6 @@ oneWeekDayFinal = (oneWeekSplit[0] + "," + oneWeekDayCleaned + "," + oneWeekSpli
 oneWeekDateTime = datetime.datetime.strptime(oneWeekDayFinal, '%A, %B %d, %Y')
 print oneWeekDateTime
 
-#print "oneWeekFromNow Split is: "+ oneWeekFromNowSplit[1]
-
-#oneWeekFromToday = todaysDate + oneWeek
-
-#print "oneWeekFromToday is: " + oneWeekFromToday
-
-#now = datetime.datetime.now()
-#print (now.strftime("%A, %b %d, %Y"))
-
-
-#oneWeek = datetime.timedelta(weeks = 1)
-
-#weekFromToday = now + oneWeek
-#print (weekFromToday.strftime("%A, %b %d, %Y"))
-#weekFromTodayString = custom_strftime('%A, %B {S}, %Y', dt.now())
 
 # For testing, set date one day from now
 day = datetime.timedelta(days=1)
@@ -73,7 +55,7 @@ oneDayfromNow = oneDaySplit[1]
 oneDayCleaned = (re.sub(r'\D+$', '', oneDayfromNow))
 oneDayFinal = (oneDaySplit[0] + "," + oneDayCleaned + "," + oneDaySplit[2])
 oneDayDateTime = datetime.datetime.strptime(oneDayFinal, '%A, %B %d, %Y')
-print oneDayDateTime, oneWeekDateTime
+#print oneDayDateTime, oneWeekDateTime
 
 
 #Set up geocoder
@@ -155,30 +137,34 @@ for event in events:
 
             #Get image
             artistImage = soup.select_one('img')
-            #artistImage.get_attribute("src")
-            #print "img is", artistImage
-            #x=driver.find_element_by_css_selector('img')
-            #print x
-
-            #image = soup.select_one('[class^=artistAndEventInfo-7c13900b] img')
-            #print "band image", image
-            #container = soup.find('div', {"class": "artistAndEventInfo-7c13900b"})
-            #children = container.find("img")
-            #thing = driver.find_element_by_xpath("//div[@class^=artistAndEventInfo-7c13900b']/img")
-            #print thing
             artistImage=driver.find_element_by_xpath("//div[@class='artistAndEventInfo-7c13900b']//img").get_attribute("src")
-            #print artistImage
-
-            #Get other event information
-            #otherInfo = soup.select_one('[class^=eventInfoContainer-a1c6de30]').text
-            #print "other info", otherInfo
 
             #Get genre information
+            genre = 'No genre available'
             try:
-                f = driver.find_element_by_xpath("//div[@class='artistBio-833c365c']")
-                print f.text
+                genre = driver.find_element_by_xpath("//div[@class='artistBio-833c365c']").text
             except (ElementNotVisibleException, NoSuchElementException):
                 pass
+
+            #Get other information
+            otherInfo = "No other event info available"
+            try:
+                otherInfo = driver.find_element_by_xpath("//div[@class='eventInfoContainer-a1c6de30']").text
+            except (ElementNotVisibleException, NoSuchElementException):
+                pass
+
+
+
+            # Get artist bio
+            artistBio = "No artist bio available"
+            try:
+                artistBio = driver.find_element_by_xpath("//div[@class='artistBio-cdbd5bde']").text
+            except (ElementNotVisibleException, NoSuchElementException):
+                pass
+
+
+
+            print artistBio, otherInfo, genre
 
             #Geocode address
             geocodeInput = venue + ", " + address
@@ -193,40 +179,36 @@ for event in events:
             item['Venue'] = venue
             item['Address'] = address
             item['artistImage'] = artistImage
-
-            #print ("date is:" + date)
-            #print ("datematch date is", dateMatchDate)
+            item['genre'] = genre
+            item['otherInfo'] = otherInfo
+            item['artistBio'] = artistBio
 
             # Get latitude, longitude
             coordinates = result['features'][0]['center']
             item['Coordinates'] = coordinates
-            #print item['Coordinates']
-
-            #print result
-            #print address, str(coordinates)
 
             # Format output to JSON
             case = {'Artist': item['Artist'], 'Date': item['Date'], 'EventDate': item['eventDate'], 'Time': item['Time'], 'Venue': item['Venue'],
-            'Address': item['Address'], 'Coordinates': coordinates, 'ArtistImage': item['artistImage']}
+            'Address': item['Address'], 'Coordinates': coordinates, 'ArtistImage': item['artistImage'], 'Genre': item['genre'], 'OtherInfo': item['otherInfo'], 'ArtistBio': item['artistBio']}
+
             item[event] = case
+
             #print case
             allEvents.append(case)
 
-            #print item
 
         elif currentRequest.status_code != 200:  # could also check == requests.codes.ok
             continue
+
+#eventsVariable = "var SFEvents = "
 #print item
 print allEvents
+#allEvents = eventsVariable + allEvents
+
 with open("testScrape.json", "w") as writeJSON:
    json.dump(item, writeJSON, sort_keys=True)
-    #for uniqueDate = i.find_all('div', {'class': 'event-b58f7990'})
-    #print (uniqueDate)
 
 with open("/Users/starrmoss/Documents/TownSounds_Javascript/data/testScrape3.json", "w") as writeJSON:
    json.dump(allEvents, writeJSON, sort_keys=True)
-    #for uniqueDate = i.find_all('div', {'class': 'event-b58f7990'})
-    #print (uniqueDate)
 
-#print result
 print "Data pull complete!"
