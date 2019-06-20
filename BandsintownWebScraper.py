@@ -205,10 +205,14 @@ for event in events:
 print allEvents
 #allEvents = eventsVariable + allEvents
 
-with open("testScrape.json", "w") as writeJSON:
-   json.dump(item, writeJSON, sort_keys=True)
+#with open("testScrape.json", "w") as writeJSON:
+   #file_str = json.dumps(allEvents, sort_keys=True)
+   #file_str = "var events = " + file_str
+   #writeJSON.write(file_str)
 
-with open("/Users/starrmoss/Documents/TownSounds_Javascript/data/testScrape3.json", "w") as writeJSON:
-   json.dump(allEvents, writeJSON, sort_keys=True)
+with open("/Users/starrmoss/Documents/TownSounds_Javascript/data/sf_events.json", "w") as writeJSON:
+    file_str = json.dumps(allEvents, sort_keys=True)
+    file_str = "var sf_events = " + file_str
+    writeJSON.write(file_str)
 
 print "Data pull complete!"
