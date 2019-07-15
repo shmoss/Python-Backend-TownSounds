@@ -37,14 +37,18 @@ def custom_strftime(format, t):
 nowDate = datetime.datetime.now()
 week = datetime.timedelta(weeks = 1)
 oneWeek = custom_strftime('%A, %B {S}, %Y', dt.now() + week)
+print oneWeek
 oneWeekSplit = oneWeek.split(',')
 oneWeekDay = oneWeekSplit[1]
 oneWeekDayCleaned = (re.sub(r'\D+$', '', oneWeekDay))
+print oneWeekDayCleaned
 oneWeekDayFinal = (oneWeekSplit[0] + "," + oneWeekDayCleaned + "," + oneWeekSplit[2])
+print oneWeekDayFinal
 #p=datetime.datetime.strptime('June 5, 2019', '%b %d, %Y')
 #print p
+print "nowDate", nowDate
 oneWeekDateTime = datetime.datetime.strptime(oneWeekDayFinal, '%A, %B %d, %Y')
-print oneWeekDateTime
+print "oneWeekDateTime", oneWeekDateTime
 
 
 # For testing, set date one day from now
@@ -70,7 +74,7 @@ base_url = 'https://www.bandsintown.com/?came_from=257&page='
 events = []
 eventContainerBucket = []
 
-for i in range(1, 2):
+for i in range(1,40):
 
     #cycle through pages in range
     driver.get(base_url + str(i))
@@ -124,6 +128,15 @@ for event in events:
 
             # Get date
             date = soup.select_one('img + div').text
+            dateSplit = date.split(',')
+            dateSplitDay = dateSplit[1]
+            dateSplitDayCleaned = (re.sub(r'\D+$', '', dateSplitDay))
+
+            dSplit = dateSplitDayCleaned.split()
+            month = dSplit[0]
+            number = dSplit[1]
+
+            dateFormatted = (dateSplit[0][0:3] + " " + month[0:3] + " " + number + dateSplit[2])
 
 
             # Get time
@@ -173,7 +186,7 @@ for event in events:
 
             #Bin information into 'item'
             item['Artist'] = artist
-            item['Date'] = date
+            item['Date'] = dateFormatted
             item['eventDate'] = eventDate
             item['Time'] = time
             item['Venue'] = venue
@@ -210,9 +223,9 @@ print allEvents
    #file_str = "var events = " + file_str
    #writeJSON.write(file_str)
 
-with open("/Users/starrmoss/Documents/TownSounds_Javascript/data/sf_events.json", "w") as writeJSON:
+with open("/Users/starrmoss/Documents/TownSounds_Javascript/data/sf_events_2.json", "w") as writeJSON:
     file_str = json.dumps(allEvents, sort_keys=True)
-    file_str = "var sf_events = " + file_str
+    file_str = "var sf_events_2 = " + file_str
     writeJSON.write(file_str)
 
 print "Data pull complete!"
