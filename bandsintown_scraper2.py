@@ -19,7 +19,7 @@ print result
 
 #This simulates page-clicks using Selenium
 #Simulate page-click for each event to grab address
-driver = webdriver.Chrome(executable_path='/Applications/chromedriver')
+driver = webdriver.Chrome(executable_path='/Applications/chromedriver 2')
 # Go to your page url
 #driver.get('https://www.bandsintown.com/?came_from=257&page=71')
 #button_element = driver.find_element_by_class_name('eventList-5e5f25ca')

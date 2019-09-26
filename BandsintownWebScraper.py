@@ -24,7 +24,7 @@ from selenium.webdriver.common.by import By
 #Set driver options
 options = Options()
 options.add_argument('--no-sandbox') # Bypass OS security model
-driverLocation = webdriver.Chrome(chrome_options=options, executable_path=r'/Applications/chromedriver74')
+driverLocation = webdriver.Chrome(chrome_options=options, executable_path=r'/Applications/chromedriver 4')
 driverLocation.quit()
 
 def suffix(d):
@@ -37,18 +37,13 @@ def custom_strftime(format, t):
 nowDate = datetime.datetime.now()
 week = datetime.timedelta(weeks = 1)
 oneWeek = custom_strftime('%A, %B {S}, %Y', dt.now() + week)
-print oneWeek
 oneWeekSplit = oneWeek.split(',')
 oneWeekDay = oneWeekSplit[1]
 oneWeekDayCleaned = (re.sub(r'\D+$', '', oneWeekDay))
-print oneWeekDayCleaned
 oneWeekDayFinal = (oneWeekSplit[0] + "," + oneWeekDayCleaned + "," + oneWeekSplit[2])
-print oneWeekDayFinal
 #p=datetime.datetime.strptime('June 5, 2019', '%b %d, %Y')
 #print p
-print "nowDate", nowDate
 oneWeekDateTime = datetime.datetime.strptime(oneWeekDayFinal, '%A, %B %d, %Y')
-print "oneWeekDateTime", oneWeekDateTime
 
 
 # For testing, set date one day from now
@@ -66,7 +61,7 @@ oneDayDateTime = datetime.datetime.strptime(oneDayFinal, '%A, %B %d, %Y')
 geocoder = mapbox.Geocoder(access_token='pk.eyJ1Ijoic3RhcnJtb3NzMSIsImEiOiJjam13ZHlxbXgwdncwM3FvMnJjeGVubjI5In0.-ridMV6bkkyNhbPfMJhVzw')
 
 #Set up web driver and base URL
-driver= webdriver.Chrome(executable_path='/Applications/chromedriver74')
+driver= webdriver.Chrome(executable_path='/Applications/chromedriver 4')
 
 #Set base url
 base_url = 'https://www.bandsintown.com/?came_from=257&page='
@@ -74,7 +69,7 @@ base_url = 'https://www.bandsintown.com/?came_from=257&page='
 events = []
 eventContainerBucket = []
 
-for i in range(1,40):
+for i in range(1,25):
 
     #cycle through pages in range
     driver.get(base_url + str(i))
@@ -99,6 +94,15 @@ for event in events:
 
     if currentRequest.status_code == 200:
         #print ("link working")
+
+        try:
+            driver.find_element_by_css_selector('[class^=eventInfoContainer-]')
+            print "element exists!"
+        except (ElementNotVisibleException, NoSuchElementException):
+            print "element doesn't exist"
+            continue
+
+
 
         soup = bs(driver.find_element_by_css_selector('[class^=eventInfoContainer-]').get_attribute('outerHTML'))
         soup2 = bs(driver.find_element_by_css_selector('[class^=artistAndEventInfo-]').get_attribute('outerHTML'))
@@ -126,6 +130,7 @@ for event in events:
             # Get artist
             artist = soup2.select_one('h1').text
 
+
             # Get date
             date = soup.select_one('img + div').text
             dateSplit = date.split(',')
@@ -137,7 +142,7 @@ for event in events:
             number = dSplit[1]
 
             dateFormatted = (dateSplit[0][0:3] + " " + month[0:3] + " " + number + dateSplit[2])
-
+            print(artist, dateFormatted)
 
             # Get time
             time = soup.select_one('img + div + div').text
@@ -177,7 +182,7 @@ for event in events:
 
 
 
-            print artistBio, otherInfo, genre
+            #print artistBio, otherInfo, genre
 
             #Geocode address
             geocodeInput = venue + ", " + address
@@ -215,7 +220,7 @@ for event in events:
 
 #eventsVariable = "var SFEvents = "
 #print item
-print allEvents
+#print allEvents
 #allEvents = eventsVariable + allEvents
 
 #with open("testScrape.json", "w") as writeJSON:
@@ -225,7 +230,7 @@ print allEvents
 
 with open("/Users/starrmoss/Documents/TownSounds_Javascript/data/sf_events_2.json", "w") as writeJSON:
     file_str = json.dumps(allEvents, sort_keys=True)
-    file_str = "var sf_events_2 = " + file_str
+    file_str = "var sf_events_3 = " + file_str
     writeJSON.write(file_str)
 
 print "Data pull complete!"
