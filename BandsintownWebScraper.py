@@ -69,7 +69,7 @@ base_url = 'https://www.bandsintown.com/?came_from=257&page='
 events = []
 eventContainerBucket = []
 
-for i in range(1,25):
+for i in range(2,80):
 
     #cycle through pages in range
     driver.get(base_url + str(i))
@@ -180,6 +180,23 @@ for event in events:
             except (ElementNotVisibleException, NoSuchElementException):
                 pass
 
+            # Capture additional bio info
+            readMore = 'artistBio-322df114'
+            try:
+                driver.find_element_by_xpath("//div[@class='artistBio-322df114']").click();
+                #print(moreInfo)
+            except (ElementNotVisibleException, NoSuchElementException):
+                pass
+
+            #Regardless of whether or not there is "Read More", print complete bio info.
+            moreBioInfo = "No artist bio available"
+            try:
+                moreBioInfo = driver.find_element_by_xpath("//div[@class='artistBio-cdbd5bde']").text
+                print("more bio info is:", moreBioInfo)
+            except (ElementNotVisibleException, NoSuchElementException):
+                print('no moreBioInfo')
+                pass
+
 
 
             #print artistBio, otherInfo, genre
@@ -199,7 +216,8 @@ for event in events:
             item['artistImage'] = artistImage
             item['genre'] = genre
             item['otherInfo'] = otherInfo
-            item['artistBio'] = artistBio
+            item['moreBioInfo'] = moreBioInfo
+            #print(moreBioInfo)
 
             # Get latitude, longitude
             coordinates = result['features'][0]['center']
@@ -207,7 +225,7 @@ for event in events:
 
             # Format output to JSON
             case = {'Artist': item['Artist'], 'Date': item['Date'], 'EventDate': item['eventDate'], 'Time': item['Time'], 'Venue': item['Venue'],
-            'Address': item['Address'], 'Coordinates': coordinates, 'ArtistImage': item['artistImage'], 'Genre': item['genre'], 'OtherInfo': item['otherInfo'], 'ArtistBio': item['artistBio']}
+            'Address': item['Address'], 'Coordinates': coordinates, 'ArtistImage': item['artistImage'], 'Genre': item['genre'], 'otherInfo': item['otherInfo'], 'moreBioInfo': item['moreBioInfo']}
 
             item[event] = case
 
